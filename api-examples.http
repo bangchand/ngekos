@@ -1,0 +1,131 @@
+### Base URLs
+@baseUrl = http://localhost:3000
+@api = {{baseUrl}}/api/v1
+@publicApi = {{api}}/public
+@protectedApi = {{api}}/protected
+
+### -------------------------------------------
+### GLOBAL & TEST ROUTES
+### -------------------------------------------
+
+### Health Check
+GET {{baseUrl}}/health
+Accept: application/json
+
+### Public Test Route
+GET {{baseUrl}}/BqSEOywguVg5llYm22
+Accept: application/json
+
+### Protected Test Route (Requires Token)
+GET {{baseUrl}}/NCOrzLzAq5mC2RuZiG
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### -------------------------------------------
+### PUBLIC ROUTES (Auth)
+### -------------------------------------------
+
+### Register a new user
+# @name register
+POST {{publicApi}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Test User",
+  "email": "test@example.com",
+  "password": "Password123!",
+  "passwordConfirm": "Password123!"
+}
+
+### Login user
+# @name login
+POST {{publicApi}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "Password123!"
+}
+
+### Save Token automatically (if using VSCode REST Client)
+@token = {{login.response.body.data.token}}
+
+
+### -------------------------------------------
+### PROTECTED ROUTES (Auth & Users)
+### -------------------------------------------
+
+### Get current user profile
+GET {{publicApi}}/auth/profile
+# Note: Currently authRouter is mounted on /public in index.ts, so its path is /api/v1/public/auth/profile
+# However, this specific route uses the 'protect' middleware natively.
+Authorization: Bearer {{token}}
+
+### Get all users
+GET {{protectedApi}}/users
+Authorization: Bearer {{token}}
+
+### Get user by ID
+@userId = {{login.response.body.data.user.id}}
+GET {{protectedApi}}/users/{{userId}}
+Authorization: Bearer {{token}}
+
+### Update user by ID
+PUT {{protectedApi}}/users/{{userId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Updated Test User",
+  "email": "updated@example.com"
+}
+
+### Delete user by ID
+DELETE {{protectedApi}}/users/{{userId}}
+Authorization: Bearer {{token}}
+
+
+### -------------------------------------------
+### PROTECTED ROUTES (Kosts - Requires ADMIN or OWNER)
+### -------------------------------------------
+
+### Create a new Kost
+# @name createKost
+POST {{protectedApi}}/kosts
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Kost Bintang Lima",
+  "description": "Fasilitas lengkap, AC, WiFi, Kamar Mandi Dalam",
+  "price": 1500000,
+  "type": "MIXED",
+  "address": "Jl. Mawar No. 123",
+  "city": "Jakarta Selatan",
+  "province": "DKI Jakarta",
+  "latitude": -6.2,
+  "longitude": 106.8
+}
+
+### Get all Kosts
+GET {{protectedApi}}/kosts
+Authorization: Bearer {{token}}
+
+### Get a Kost by ID
+@kostId = {{createKost.response.body.data.id}}
+GET {{protectedApi}}/kosts/{{kostId}}
+Authorization: Bearer {{token}}
+
+### Update a Kost
+PUT {{protectedApi}}/kosts/{{kostId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "price": 1750000,
+  "description": "Harga naik karena listrik mahal"
+}
+
+### Delete a Kost
+DELETE {{protectedApi}}/kosts/{{kostId}}
+Authorization: Bearer {{token}}

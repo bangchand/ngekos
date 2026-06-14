@@ -1,0 +1,28 @@
+enum MediaType {
+  PHOTO
+  VIDEO
+}
+
+enum EntityType {
+  KOST
+  ROOM
+  FACILITY
+  USER
+}
+
+model Media {
+  id         String     @id @default(uuid())
+  url        String
+  type       MediaType  @default(PHOTO)
+
+  // Polymorphic fields
+  entityId   String
+  entityType EntityType
+
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  // Index untuk mempercepat pencarian media berdasarkan entity
+  @@index([entityId, entityType])
+  @@map("media")
+}

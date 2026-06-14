@@ -129,3 +129,34 @@ Authorization: Bearer {{token}}
 ### Delete a Kost
 DELETE {{protectedApi}}/kosts/{{kostId}}
 Authorization: Bearer {{token}}
+
+### -------------------------------------------
+### WEBHOOK TESTS
+### -------------------------------------------
+
+### Request Reverse OTP
+# @name requestOtp
+POST {{baseUrl}}/api/v1/BqSEOywguVg5llYm22/fonnte/request-otp
+Content-Type: application/json
+
+{
+  "name": "Chandra",
+  "phone": "081234567890"
+}
+
+### Cek Status Verifikasi OTP (Polling)
+# Ganti REG-XXXX dengan kode unik dari requestOtp
+GET {{baseUrl}}/api/v1/BqSEOywguVg5llYm22/fonnte/check-otp-status/REG-1234
+
+### Simulate Fonnte Webhook Incoming Message (OTP Verification)
+# Ganti "message" di bawah dengan kode unik yang didapat dari requestOtp di atas
+POST {{baseUrl}}/api/v1/BqSEOywguVg5llYm22/fonnte/webhook
+Content-Type: application/json
+
+{
+  "device": "081234567890",
+  "sender": "089876543210",
+  "message": "Halo min, mau tanya kost",
+  "name": "Budi Santoso",
+  "location": ""
+}

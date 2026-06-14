@@ -16,6 +16,10 @@ import { env } from '@/config/env';
 
 const app: Express = express();
 
+// Trust proxy is required if you are behind a reverse proxy (e.g. Ngrok, Nginx, Heroku)
+// This fixes the 'express-rate-limit' warning about X-Forwarded-For header.
+app.set('trust proxy', 1);
+
 // ==========================================
 // Global Middlewares
 // ==========================================
@@ -48,6 +52,10 @@ app.use(cookieParser());
 // 7. Global API Rate Limiter
 app.use('/api', rateLimiter);
 
+// 8. Serve Static Files (For Uploads)
+import path from 'path';
+app.use('/public', express.static(path.join(process.cwd(), 'public')));
+
 // ==========================================
 // Base Routes & API Mounting
 // ==========================================
@@ -76,7 +84,7 @@ app.use('/api/v1', apiRouter);
 
 // Handle unhandled routes (404s)
 app.all('/*splat', (req: Request, res: Response, next: NextFunction) => {
-  next(new AppError(`Route ${req.originalUrl} not found on this server!`, 404));
+  next(new AppError(`Rute ${req.originalUrl} tidak ditemukan di server ini!`, 404));
 });
 
 // Global Error Handler Middleware (Must be last)

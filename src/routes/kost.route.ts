@@ -9,38 +9,40 @@ import {
 import { protect, restrictTo } from '@/middlewares/auth.middleware';
 import { asyncHandler } from '@/utils/async-handler';
 
-const router = Router();
+const routerPrivate = Router();
+const routerPublic = Router();
 
-// Protect all kost routes below
-router.use(protect);
+// Public routes
+routerPublic.get('/', asyncHandler(KostController.getKosts));
 
-// Allow only OWNER and ADMIN to perform Kost operations
-router.use(restrictTo('OWNER', 'ADMIN'));
-
-router.get('/', asyncHandler(KostController.getKosts));
-
-router.get(
+routerPublic.get(
   '/:id',
   validate(getKostByIdSchema),
   asyncHandler(KostController.getKostById)
 );
 
-router.post(
+routerPrivate.use(protect);
+
+routerPrivate.use(restrictTo('OWNER', 'ADMIN'));
+
+routerPrivate.get('/', asyncHandler(KostController.getKosts));
+
+routerPrivate.post(
   '/',
   validate(createKostSchema),
   asyncHandler(KostController.createKost)
 );
 
-router.put(
+routerPrivate.put(
   '/:id',
   validate(updateKostSchema),
   asyncHandler(KostController.updateKost)
 );
 
-router.delete(
+routerPrivate.delete(
   '/:id',
   validate(getKostByIdSchema),
   asyncHandler(KostController.deleteKost)
 );
 
-export const kostRouter = router;
+export const kostRouter = { routerPublic, routerPrivate };

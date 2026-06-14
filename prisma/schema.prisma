@@ -10,47 +10,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  name      String?
-  password  String
-  role      Role     @default(USER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  kosts     Kost[]
-
-  @@map("users")
-}
-
-model Kost {
-  id          String   @id @default(uuid())
-  ownerId     String
-  owner       User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-
-  name        String
-  description String?
-
-  price       Decimal
-  type        KostType
-
-  address     String
-  city        String
-  province    String?
-
-  latitude    Float?
-  longitude   Float?
-
-  thumbnail   String?
-
-  status      KostStatus @default(PENDING)
-
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@map("kosts")
-}
-
 enum KostType {
   MALE
   FEMALE

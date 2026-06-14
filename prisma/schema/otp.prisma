@@ -1,0 +1,12 @@
+model OtpRegistration {
+  id        String   @id @default(uuid())
+  code      String   @unique
+  name      String
+  phone     String
+  status    String   @default("PENDING") // PENDING, VERIFIED
+  token     String? // Akan diisi JWT saat verifikasi berhasil
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  @@map("otp_registrations")
+}

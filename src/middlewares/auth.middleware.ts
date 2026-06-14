@@ -27,7 +27,7 @@ export const protect = asyncHandler(
 
     if (!token) {
       return next(
-        new AppError('You are not logged in! Please log in to get access.', 401)
+        new AppError('Kamu belum login! Silakan login untuk mendapatkan akses.', 401)
       );
     }
 
@@ -49,7 +49,7 @@ export const protect = asyncHandler(
 
     if (!user) {
       return next(
-        new AppError('The user belonging to this token no longer exists.', 401)
+        new AppError('Pengguna dengan token ini tidak lagi tersedia.', 401)
       );
     }
 
@@ -64,7 +64,7 @@ export const restrictTo = (...roles: string[]) => {
     // req.user must exist at this point (because of protect middleware)
     if (!req.user || !req.user.role || !roles.includes(req.user.role)) {
       return next(
-        new AppError('You do not have permission to perform this action', 403)
+        new AppError('Kamu tidak memiliki izin untuk melakukan aksi ini', 403)
       );
     }
     next();

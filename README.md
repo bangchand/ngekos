@@ -140,6 +140,61 @@ npm run prisma:studio
 
 ---
 
+## 🔍 Advanced Querying (Filtering, Sorting, Pagination)
+
+This boilerplate includes a powerful `PrismaQueryBuilder` that automatically parses query parameters into Prisma options. You can use these features on `GET` list endpoints (e.g., `/api/v1/users`, `/api/v1/kosts`).
+
+### 1. Pagination (`page` & `limit`)
+By default, the API returns page 1 with 10 items.
+```http
+GET /api/v1/kosts?page=2&limit=5
+```
+**Response Meta Data:**
+```json
+"meta": {
+  "results": 5,
+  "total": 50,
+  "page": 2,
+  "limit": 5,
+  "totalPages": 10
+}
+```
+
+### 2. Sorting (`sort`)
+Prefix with `-` for descending order.
+```http
+GET /api/v1/kosts?sort=-createdAt,name
+```
+
+### 3. Field Selection (`fields`)
+Return only specific columns.
+```http
+GET /api/v1/kosts?fields=id,name,city
+```
+
+### 4. Relations / Include (`include`)
+Fetch related data.
+```http
+GET /api/v1/kosts?include=owner,rooms
+```
+> **💡 Pro Tip for Frontend:** 
+> If you only need specific fields from a relation, use `fields` with dot notation (e.g., `fields=owner.name`). You **DO NOT** need to pass `include=owner`. Prisma will automatically join the table and return a smaller payload!
+
+### 5. Advanced Filtering (Prisma Operators)
+Use standard Prisma operators like `contains`, `gte`, `lte`, `in`, `notIn`.
+```http
+# Exact match
+GET /api/v1/kosts?city=Bandung&type=MALE
+
+# Text Search
+GET /api/v1/kosts?name[contains]=Jaya
+
+# Greater than / Less than
+GET /api/v1/rooms?price[gte]=1000000&price[lte]=2000000
+```
+
+---
+
 ## 📝 Example Request & Response Payloads
 
 ### 1. User Registration (`POST /api/v1/auth/register`)

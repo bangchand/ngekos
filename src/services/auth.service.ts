@@ -19,7 +19,7 @@ export class AuthService {
     });
 
     if (existingUser) {
-      throw new AppError('Email address is already in use', 400);
+      throw new AppError('Alamat email sudah digunakan', 400);
     }
 
     // 2. Hash password
@@ -56,14 +56,14 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new AppError('Invalid email or password', 401);
+      throw new AppError('Email atau password salah', 401);
     }
 
     // 2. Check password match
     const isPasswordMatch = await bcrypt.compare(password, user.password);
 
     if (!isPasswordMatch) {
-      throw new AppError('Invalid email or password', 401);
+      throw new AppError('Email atau password salah', 401);
     }
 
     // 3. Generate JWT

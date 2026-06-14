@@ -1,0 +1,23 @@
+enum FacilityType {
+  ROOM_SPEC
+  ROOM_FACILITY
+  BATHROOM_FACILITY
+  PUBLIC_FACILITY
+  PARKING_FACILITY
+  KOST_FACILITY
+}
+
+model Facility {
+  id          String  @id @default(uuid())
+  name        String       @unique
+  type        FacilityType @default(ROOM_FACILITY)
+  icon        String?
+  description String?
+
+  rooms Room[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("facilities")
+}

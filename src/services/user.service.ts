@@ -7,20 +7,21 @@ export class UserService {
   /**
    * Retrieves all users (sanitized)
    */
-  public static async getUsers(): Promise<UserWithoutPassword[]> {
-    return prisma.user.findMany({
-      select: {
+  public static async getUsers(queryOptions: any = {}): Promise<{ data: UserWithoutPassword[], total: number }> {
+    if (!queryOptions.include) {
+      queryOptions.select = {
         id: true,
         email: true,
         name: true,
         role: true,
         createdAt: true,
         updatedAt: true,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
+        ...queryOptions.select,
+      };
+    }
+    const data = await prisma.user.findMany(queryOptions);
+    const total = await prisma.user.count({ where: queryOptions.where });
+    return { data, total };
   }
 
   /**
@@ -40,7 +41,7 @@ export class UserService {
     });
 
     if (!user) {
-      throw new AppError('User not found', 404);
+      throw new AppError('Pengguna tidak ditemukan', 404);
     }
 
     return user;
@@ -59,7 +60,7 @@ export class UserService {
     });
 
     if (!user) {
-      throw new AppError('User not found', 404);
+      throw new AppError('Pengguna tidak ditemukan', 404);
     }
 
     const updateData: Partial<typeof user> = {};
@@ -74,7 +75,7 @@ export class UserService {
         },
       });
       if (emailInUse) {
-        throw new AppError('Email is already in use by another user', 400);
+        throw new AppError('Email sudah digunakan oleh pengguna lain', 400);
       }
       updateData.email = input.email;
     }
@@ -115,7 +116,7 @@ export class UserService {
     });
 
     if (!user) {
-      throw new AppError('User not found', 404);
+      throw new AppError('Pengguna tidak ditemukan', 404);
     }
 
     // 2. Delete user

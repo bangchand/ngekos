@@ -8,6 +8,6 @@ export const rateLimiter = rateLimit({
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
   handler: (req, res, next) => {
-    next(new AppError('Too many requests from this IP, please try again later.', 429));
+    next(new AppError('Terlalu banyak request dari IP ini, silakan coba lagi nanti.', 429));
   },
 });

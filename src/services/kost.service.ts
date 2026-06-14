@@ -7,15 +7,19 @@ export class KostService {
   /**
    * Retrieves all kosts
    */
-  public static async getKosts(): Promise<Kost[]> {
-    return prisma.kost.findMany({
-      orderBy: { createdAt: 'desc' },
-      include: {
+  public static async getKosts(queryOptions: any = {}): Promise<{ data: Kost[], total: number }> {
+    if (!queryOptions.select) {
+      queryOptions.include = {
+        ...queryOptions.include,
         owner: {
           select: { id: true, name: true, email: true },
         },
-      },
-    });
+        rooms: true,
+      };
+    }
+    const data = await prisma.kost.findMany(queryOptions);
+    const total = await prisma.kost.count({ where: queryOptions.where });
+    return { data, total };
   }
 
   /**
@@ -28,11 +32,14 @@ export class KostService {
         owner: {
           select: { id: true, name: true, email: true },
         },
+        rooms: {
+          include: { facilities: true }
+        },
       },
     });
 
     if (!kost) {
-      throw new AppError('Kost not found', 404);
+      throw new AppError('Kost tidak ditemukan', 404);
     }
 
     return kost;
@@ -57,12 +64,12 @@ export class KostService {
     const kost = await prisma.kost.findUnique({ where: { id } });
 
     if (!kost) {
-      throw new AppError('Kost not found', 404);
+      throw new AppError('Kost tidak ditemukan', 404);
     }
 
     // Ensure only the owner can update their kost
     if (kost.ownerId !== ownerId) {
-      throw new AppError('You do not have permission to update this kost', 403);
+      throw new AppError('Kamu tidak memiliki izin untuk mengubah Kost ini', 403);
     }
 
     return prisma.kost.update({
@@ -78,12 +85,12 @@ export class KostService {
     const kost = await prisma.kost.findUnique({ where: { id } });
 
     if (!kost) {
-      throw new AppError('Kost not found', 404);
+      throw new AppError('Kost tidak ditemukan', 404);
     }
 
     // Ensure only the owner or an admin can delete the kost
     if (kost.ownerId !== ownerId && userRole !== 'ADMIN') {
-      throw new AppError('You do not have permission to delete this kost', 403);
+      throw new AppError('Kamu tidak memiliki izin untuk menghapus Kost ini', 403);
     }
 
     await prisma.kost.delete({

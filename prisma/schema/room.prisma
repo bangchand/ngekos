@@ -1,0 +1,17 @@
+model Room {
+  id     String @id @default(uuid())
+  kostId String
+  kost   Kost   @relation(fields: [kostId], references: [id], onDelete: Cascade)
+
+  name        String
+  description String?
+  price       Decimal
+  stock       Int     @default(1)
+
+  facilities Facility[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("rooms")
+}

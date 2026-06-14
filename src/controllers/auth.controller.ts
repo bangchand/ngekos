@@ -17,7 +17,7 @@ export class AuthController {
       maxAge: 24 * 60 * 60 * 1000, // 1 day
     });
 
-    ApiResponse.success(res, 'User registered successfully', result, 201);
+    ApiResponse.success(res, 'Registrasi pengguna berhasil', result, 201);
   };
 
   /**
@@ -33,7 +33,7 @@ export class AuthController {
       maxAge: 24 * 60 * 60 * 1000, // 1 day
     });
 
-    ApiResponse.success(res, 'User logged in successfully', result, 200);
+    ApiResponse.success(res, 'Login berhasil', result, 200);
   };
 
   /**
@@ -41,6 +41,6 @@ export class AuthController {
    */
   public static getProfile = async (req: Request, res: Response): Promise<void> => {
     // req.user is set by the protect middleware
-    ApiResponse.success(res, 'User profile retrieved successfully', { user: req.user }, 200);
+    ApiResponse.success(res, 'Berhasil mengambil profil pengguna', { user: req.user }, 200);
   };
 }

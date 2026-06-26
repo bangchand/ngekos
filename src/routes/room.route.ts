@@ -19,10 +19,18 @@ routerPublic.get(
 
 routerPrivate.get('/', asyncHandler(RoomController.getRooms));
 
+routerPrivate.get('/saved', asyncHandler(RoomController.getSavedRooms));
+
 routerPrivate.get(
   '/:id',
   validate(getRoomByIdSchema),
   asyncHandler(RoomController.getRoomById)
+);
+
+routerPrivate.post(
+  '/:id/save',
+  validate(getRoomByIdSchema), // Ensure ID is valid
+  asyncHandler(RoomController.toggleSaveRoom)
 );
 
 routerPrivate.post(

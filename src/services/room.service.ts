@@ -106,4 +106,58 @@ export class RoomService {
 
     await prisma.room.delete({ where: { id } });
   };
+
+  public static toggleSaveRoom = async (userId: string, roomId: string) => {
+    const room = await prisma.room.findUnique({ where: { id: roomId } });
+    if (!room) {
+      throw new AppError('Kamar tidak ditemukan', 404);
+    }
+
+    const existingSavedRoom = await prisma.savedRoom.findUnique({
+      where: {
+        userId_roomId: {
+          userId,
+          roomId,
+        },
+      },
+    });
+
+    if (existingSavedRoom) {
+      await prisma.savedRoom.delete({
+        where: {
+          userId_roomId: { userId, roomId },
+        },
+      });
+      return { saved: false, message: 'Kamar berhasil dihapus dari favorit' };
+    } else {
+      await prisma.savedRoom.create({
+        data: { userId, roomId },
+      });
+      return { saved: true, message: 'Kamar berhasil ditambahkan ke favorit' };
+    }
+  };
+
+  public static getSavedRooms = async (userId: string, queryOptions: any = {}) => {
+    if (!queryOptions.include) {
+      queryOptions.include = {
+        room: {
+          include: {
+            kost: true,
+            facilities: true,
+          }
+        }
+      };
+    }
+    
+    // force where clause to only user's saved rooms
+    queryOptions.where = {
+      ...queryOptions.where,
+      userId,
+    };
+
+    const data = await prisma.savedRoom.findMany(queryOptions);
+    const total = await prisma.savedRoom.count({ where: queryOptions.where });
+
+    return { data, total };
+  };
 }

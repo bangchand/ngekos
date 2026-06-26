@@ -12,9 +12,33 @@ export class KostController {
     const builder = new PrismaQueryBuilder(req.query);
     const queryOptions = builder.build();
 
-    const { data, total } = await KostService.getKosts(queryOptions);
+    let imagesSelect: any = undefined;
+    let videoSelect: any = undefined;
 
-    ApiResponse.success(res, 'Berhasil mengambil daftar kost', data, 200, builder.getMeta(total, data.length));
+    // Hapus virtual fields dari Prisma query (karena tidak ada di schema)
+    if (queryOptions.select) {
+      if (queryOptions.select.images && queryOptions.select.images.select) {
+        imagesSelect = queryOptions.select.images.select;
+      }
+      delete queryOptions.select.images;
+
+      if (queryOptions.select.video && queryOptions.select.video.select) {
+        videoSelect = queryOptions.select.video.select;
+      }
+      delete queryOptions.select.video;
+
+      if (Object.keys(queryOptions.select).length === 0) delete queryOptions.select;
+    }
+    if (queryOptions.include) {
+      delete queryOptions.include.images;
+      delete queryOptions.include.video;
+      if (Object.keys(queryOptions.include).length === 0) delete queryOptions.include;
+    }
+
+    const { data, total } = await KostService.getKosts(queryOptions);
+    const dataWithMedia = await MediaService.attachMedia(data, 'KOST', imagesSelect, videoSelect);
+
+    ApiResponse.success(res, 'Berhasil mengambil daftar kost', dataWithMedia, 200, builder.getMeta(total, data.length));
   };
 
   /**
@@ -23,7 +47,8 @@ export class KostController {
   public static getKostById = async (req: Request, res: Response): Promise<void> => {
     const id = req.params.id as string;
     const kost = await KostService.getKostById(id);
-    ApiResponse.success(res, 'Berhasil mengambil data kost', kost, 200);
+    const kostWithMedia = await MediaService.attachMedia(kost, 'KOST');
+    ApiResponse.success(res, 'Berhasil mengambil data kost', kostWithMedia, 200);
   };
 
   /**
@@ -33,7 +58,16 @@ export class KostController {
     const ownerId = req.user!.id;
 
     const newKost = await KostService.createKost(ownerId, req.body);
-    ApiResponse.success(res, 'Berhasil membuat kost baru', newKost, 201);
+    
+    // Process uploaded files for media
+    await MediaService.processAndSaveMedia(
+      req.files as { [fieldname: string]: Express.Multer.File[] },
+      newKost.id,
+      'KOST'
+    );
+
+    const kostWithMedia = await MediaService.attachMedia(newKost, 'KOST');
+    ApiResponse.success(res, 'Berhasil membuat kost baru', kostWithMedia, 201);
   };
 
   /**
@@ -44,7 +78,16 @@ export class KostController {
     const ownerId = req.user!.id;
 
     const updatedKost = await KostService.updateKost(id, ownerId, req.body);
-    ApiResponse.success(res, 'Berhasil memperbarui data kost', updatedKost, 200);
+    
+    // Process uploaded files for media
+    await MediaService.processAndSaveMedia(
+      req.files as { [fieldname: string]: Express.Multer.File[] },
+      updatedKost.id,
+      'KOST'
+    );
+
+    const kostWithMedia = await MediaService.attachMedia(updatedKost, 'KOST');
+    ApiResponse.success(res, 'Berhasil memperbarui data kost', kostWithMedia, 200);
   };
 
   /**

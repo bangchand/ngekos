@@ -6,6 +6,9 @@ import { createFacilitySchema, updateFacilitySchema, getFacilityByIdSchema } fro
 import { asyncHandler } from '@/utils/async-handler';
 
 const routerPrivate = Router();
+const routerPublic = Router();
+
+routerPublic.get('/', asyncHandler(FacilityController.getFacilities));
 
 routerPrivate.use(protect);
 
@@ -40,4 +43,4 @@ routerPrivate.delete(
   asyncHandler(FacilityController.deleteFacility)
 );
 
-export const facilityRouter = { routerPrivate };
+export const facilityRouter = { routerPrivate, routerPublic };

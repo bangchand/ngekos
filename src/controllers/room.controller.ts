@@ -84,4 +84,29 @@ export class RoomController {
     await RoomService.deleteRoom(id, ownerId);
     ApiResponse.success(res, 'Berhasil menghapus kamar', null, 200);
   };
+
+  public static toggleSaveRoom = async (req: Request, res: Response): Promise<void> => {
+    const roomId = req.params.id as string;
+    const userId = req.user!.id;
+    const result = await RoomService.toggleSaveRoom(userId, roomId);
+    ApiResponse.success(res, result.message, { saved: result.saved }, 200);
+  };
+
+  public static getSavedRooms = async (req: Request, res: Response): Promise<void> => {
+    const userId = req.user!.id;
+    const builder = new PrismaQueryBuilder(req.query);
+    const queryOptions = builder.build();
+
+    const { data, total } = await RoomService.getSavedRooms(userId, queryOptions);
+    
+    // Attach media to the room inside savedRoom
+    const dataWithMedia = await Promise.all(
+      data.map(async (savedRoom: any) => {
+        savedRoom.room = await MediaService.attachMedia(savedRoom.room, 'ROOM');
+        return savedRoom;
+      })
+    );
+
+    ApiResponse.success(res, 'Berhasil mengambil daftar kamar favorit', dataWithMedia, 200, builder.getMeta(total, data.length));
+  };
 }

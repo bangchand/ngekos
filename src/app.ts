@@ -20,6 +20,10 @@ const app: Express = express();
 // This fixes the 'express-rate-limit' warning about X-Forwarded-For header.
 app.set('trust proxy', 1);
 
+// Gunakan query parser 'extended' (berbasis library qs) agar dapat mem-parse nested object/array.
+// Hal ini sangat penting untuk PrismaQueryBuilder karena Express 5 defaultnya 'simple'.
+app.set('query parser', 'extended');
+
 // ==========================================
 // Global Middlewares
 // ==========================================

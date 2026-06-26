@@ -8,6 +8,7 @@ import {
 } from '@/validators/kost.validator';
 import { protect, restrictTo } from '@/middlewares/auth.middleware';
 import { asyncHandler } from '@/utils/async-handler';
+import { upload, parseFormDataJson } from '@/middlewares/upload.middleware';
 
 const routerPrivate = Router();
 const routerPublic = Router();

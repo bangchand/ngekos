@@ -18,6 +18,8 @@ protectedRoutes.use(restrictTo('OWNER', 'ADMIN', 'USER'));
 publicRoutes.use('/auth', authRouter);
 publicRoutes.use('/fonnte', fonnteRouter);
 publicRoutes.use('/kosts', kostRouter.routerPublic);
+publicRoutes.use('/rooms', roomRouter.routerPublic);
+publicRoutes.use('/facilities', facilityRouter.routerPublic);
 
 // Protected Routes (token required)
 // Assuming userRouter handles profiles etc and should be protected

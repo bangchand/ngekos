@@ -6,7 +6,8 @@ model User {
   role      Role     @default(USER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  kosts     Kost[]
+  kosts      Kost[]
+  savedRooms SavedRoom[]
 
   @@map("users")
 }

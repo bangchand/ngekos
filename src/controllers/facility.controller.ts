@@ -12,9 +12,10 @@ export class FacilityController {
     const queryOptions = builder.build();
     
     const { data, total } = await FacilityService.getFacilities(queryOptions);
+    const formattedData = builder.formatData(data);
     
     // We send a custom response here to include pagination metadata
-    ApiResponse.success(res, 'Berhasil mengambil daftar fasilitas', data, 200, builder.getMeta(total, data.length));
+    ApiResponse.success(res, 'Berhasil mengambil daftar fasilitas', formattedData, 200, builder.getMeta(total, data.length));
   };
 
   /**
